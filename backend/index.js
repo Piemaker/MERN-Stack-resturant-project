@@ -2,6 +2,7 @@ import app from "./server.js";
 import mongodb from "mongodb";
 import dotenv from "dotenv";
 import RestaurantsDAO from "./dao/restaurantsDAO.js";
+import ReviewsDAO from "./dao/reviewsDAO.js";
 
 dotenv.config();
 const mongoClient = mongodb.MongoClient;
@@ -20,11 +21,11 @@ mongoClient
     process.exit(1);
   })
   .then(async (client) => {
-    //* here the client is connected so the connection in the method is skipped
     await RestaurantsDAO.injectDB(client);
+    await ReviewsDAO.injectDB(client);
     app.listen(port, () => {
       console.log(
-        "🚀 ~ file: index.js ~ line 26 ~ app.listen ~ `listening on port ${port}`",
+        "🚀 ~ file: index.js ~ line 26 ~ app.listen",
         `listening on port ${port}`
       );
     });

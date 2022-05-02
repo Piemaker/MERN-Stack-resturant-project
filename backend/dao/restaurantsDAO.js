@@ -1,4 +1,6 @@
 // DAO (Data Access Object)
+//  a pattern that provides an abstract interface to some type of database or other persistence mechanism.
+// persistence mechanism is the queries manipulating the DB
 //* Reference to the DB
 let restaurants;
 
@@ -8,20 +10,19 @@ export default class RestaurantsDAO {
     //* the reference can either be initialized at the time of calling, or not
     if (restaurants) {
       // already initialized skip connection
-      console.log("RestaurantsDAO, connection already established")
+      console.log("RestaurantsDAO, connection already established");
       return;
     }
     try {
       // connect and get restaurants collection specifically (neighborhood exists too)
       restaurants = await conn
-        .db(process.env.RESTAURANTS_REVIEWS)
+        .db(process.env.RESTAURANT_SAMPLE)
         .collection("restaurants");
     } catch (e) {
       console.error(`Unable to connect to collection in restaurantsDAO ${e}`);
     }
-
-    // Queries
   }
+  // Queries
   //* you have to pass an empty {} in order to initialize the defaults
   static async getRestaurants({
     filters = null,
@@ -50,18 +51,20 @@ export default class RestaurantsDAO {
       return { restaurantList: [], totalNumRestaurants: 0 };
     }
     //! displayCursor was set to const which stopped it from working
-   let displayCursor = cursor.limit(restaurantsPerPage).skip(restaurantsPerPage * page)
+    let displayCursor = cursor
+      .limit(restaurantsPerPage)
+      .skip(restaurantsPerPage * page);
 
     try {
-      const restaurantsList = await displayCursor.toArray()
-      const totalNumRestaurants = await restaurants.countDocuments(query)
+      const restaurantsList = await displayCursor.toArray();
+      const totalNumRestaurants = await restaurants.countDocuments(query);
 
-      return { restaurantsList, totalNumRestaurants }
+      return { restaurantsList, totalNumRestaurants };
     } catch (e) {
       console.error(
-        `Unable to convert cursor to array or problem counting documents, ${e}`,
-      )
-      return { restaurantsList: [], totalNumRestaurants: 0 }
+        `Unable to convert cursor to array or problem counting documents, ${e}`
+      );
+      return { restaurantsList: [], totalNumRestaurants: 0 };
     }
   }
 }
