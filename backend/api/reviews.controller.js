@@ -1,6 +1,16 @@
-import ReviewsDAO from "./dao/reviewsDAO.js";
+import ReviewsDAO from "../dao/reviewsDAO.js";
 
 export default class ReviewController {
+  static async apiGetReviews(req, res, next) {
+    try {
+      const reviewResponse = await ReviewsDAO.apiGetReviews();
+      res.json({ response: reviewResponse });
+    } catch (e) {
+      console.error(`Unable to find documents, ${e}`);
+      res.status(500).json({ error: e.message });
+    }
+  }
+
   static async apiPostReview(req, res, next) {
     const { text, restaurantId } = req.body;
     const user = {
@@ -14,11 +24,11 @@ export default class ReviewController {
       user,
       date,
     };
-    const ReviewResponse = await ReviewsDAO.apiAddReview(reviewObject);
-    res.json({ response: ReviewResponse });
+    const reviewResponse = await ReviewsDAO.apiAddReview(reviewObject);
+    res.json({ response: reviewResponse });
     console.log(
-      "🚀 ~ file: review.controller.js ~ line 19 ~ ReviewController ~ apiPostReview ~ ReviewResponse",
-      ReviewResponse
+      "🚀 ~ file: review.controller.js ~ line 19 ~ ReviewController ~ apiPostReview ~ reviewResponse",
+      reviewResponse
     );
   }
   catch(e) {
@@ -31,8 +41,8 @@ export default class ReviewController {
       //! not something done in real application because of authentication
       const { userId } = req.body;
       const reviewObject = { reviewId, userId };
-      const ReviewResponse = await ReviewsDAO.apiDeleteReview(reviewObject);
-      res.json({ response: ReviewResponse });
+      const reviewResponse = await ReviewsDAO.apiDeleteReview(reviewObject);
+      res.json({ response: reviewResponse });
     } catch (e) {
       res.status(500).json({ error: e.message });
     }
@@ -43,19 +53,19 @@ export default class ReviewController {
       const { userId, text, reviewId } = req.body;
       const date = new Date();
       const reviewObject = { reviewId, userId, text, date };
-      const ReviewResponse = await ReviewsDAO.apiUpdateReview(reviewObject);
-      let { error } = ReviewResponse;
+      const reviewResponse = await ReviewsDAO.apiUpdateReview(reviewObject);
+      let { error } = reviewResponse;
       if (error) {
         res.status(400).json({ error });
       }
 
-      if (ReviewResponse.modifiedCount === 0) {
+      if (reviewResponse.modifiedCount === 0) {
         throw new Error(
           "unable to update review - user may not be original poster"
         );
       }
 
-      res.json({ response: ReviewResponse });
+      res.json({ response: reviewResponse });
     } catch (e) {
       res.status(500).json({ error: e.message });
     }

@@ -25,6 +25,26 @@ export default class ReviewsDAO {
   }
   // QUERIES
 
+  static async apiGetReviews() {
+    let reviewCursor;
+    try {
+      reviewCursor = await reviews.find();
+    } catch (e) {
+      console.error(`Error in getting reviews ${e}`);
+      return { error: e };
+    }
+
+    try {
+      const reviewResponse = await reviewCursor.toArray();
+      const totalNumReviews = await reviews.countDocuments();
+      return { reviewResponse, totalNumReviews };
+    } catch (e) {
+      console.error(
+        `Unable to convert cursor to array or problem counting documents, ${e}`
+      );
+    }
+  }
+
   static async apiAddReview({ restaurantId, user, text, date } = {}) {
     try {
       const reviewDoc = {
