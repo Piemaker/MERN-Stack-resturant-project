@@ -1,6 +1,9 @@
 // DAO (Data Access Object)
 //  a pattern that provides an abstract interface to some type of database or other persistence mechanism.
 // persistence mechanism is the queries manipulating the DB
+
+import { ObjectId } from "mongodb";
+
 //* Reference to the DB
 let restaurants;
 
@@ -65,6 +68,53 @@ export default class RestaurantsDAO {
         `Unable to convert cursor to array or problem counting documents, ${e}`
       );
       return { restaurantsList: [], totalNumRestaurants: 0 };
+    }
+  }
+  static async apiGetRestaurantById(id) {
+    console.log(
+      "🚀 ~ file: restaurantsDAO.js ~ line 74 ~ RestaurantsDAO ~ apiGetRestaurantById ~ id",
+      id
+    );
+    try {
+      let mongoRestaurantId = ObjectId(id);
+      // const responseCursor = await restaurants.find({ _id: mongoRestaurantId });
+
+      const responseCursor = await restaurants.aggregate([
+        {
+          $match: {
+            _id: mongoRestaurantId,
+          },
+        },
+
+        {
+          $lookup: {
+            from: "reviews",
+            localField: "_id",
+            foreignField: "restaurant_id",
+            as: "restaurant_reviews",
+            pipeline: [
+              {
+                $sort: {
+                  date: -1,
+                },
+              },
+            ],
+          },
+        },
+      ]);
+      //* you can use either .toArray or .next to get the array response
+      return await responseCursor.next();
+    } catch (e) {
+      console.error(`RestaurantDAO, Unable to find restaurant by id, ${e}`);
+    }
+  }
+  static async apiGetRestaurantCuisines() {
+    try {
+      return await restaurants.distinct("cuisine");
+    } catch (e) {
+      console.error(`RestaurantDAO, Unable to find restaurant cuisines, ${e}`);
+
+      
     }
   }
 }

@@ -1,6 +1,5 @@
 import RestaurantsDAO from "../dao/restaurantsDAO.js";
 
-
 export default class RestaurantsController {
   static async apiGetRestaurants(req, res, next) {
     // get values from passed in queries
@@ -33,5 +32,32 @@ export default class RestaurantsController {
       restaurantsPerPage,
     };
     res.json(response);
+  }
+  static async apiGetRestaurantById(req, res, next) {
+    try {
+      const { id } = req.params || {};
+      let response = await RestaurantsDAO.apiGetRestaurantById(id);
+      if (!response) {
+        res.status(404).json({ error: "Not Found" });
+      } else {
+        res.json({ response: response });
+      }
+    } catch (error) {
+      console.error(`Error in finding restaurant by id, ${e}`);
+      res.status(500).json({ error: error });
+    }
+  }
+  static async apiGetRestaurantCuisines(req, res, next) {
+    try {
+      let response = await RestaurantsDAO.apiGetRestaurantCuisines();
+      if (!response) {
+        res.status(404).json({ error: "Not Found" });
+      } else {
+        res.json({ response: response });
+      }
+    } catch (error) {
+      console.error(`Error in finding cuisines, ${e}`);
+      res.status(500).json({ error: error });
+    }
   }
 }
