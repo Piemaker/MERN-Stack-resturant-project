@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, } from "react-bootstrap";
+import { Container, Row } from "react-bootstrap";
 import DataFetchingClass from "../../DataFetchingClass";
 import CustomSpinner from "../CustomSpinner";
 import PaginationComponent from "../PaginationComponent";
@@ -10,23 +10,23 @@ export default function RestaurantList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRestaurantCount, setTotalRestaurantCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const fetchAllRestaurants = async () => {
-    try {
-      setIsLoading(true);
-      const response = await await DataFetchingClass.getAll(currentPage);
-      console.log(
-        "🚀 ~ file: RestaurantList.jsx ~ line 8 ~ fetchAllRestaurants ~ response",
-        response
-      );
-      const { restaurantsList } = response.data;
-      setRestaurantsList(restaurantsList);
-      setTotalRestaurantCount(response.data.totalNumRestaurants);
-      setIsLoading(false);
-    } catch (error) {
-      console.error(`Error in fetching restaurant data, ${error}`);
-    }
-  };
   useEffect(() => {
+    const fetchAllRestaurants = async () => {
+      try {
+        setIsLoading(true);
+        const response = await await DataFetchingClass.getAll(currentPage);
+        console.log(
+          "🚀 ~ file: RestaurantList.jsx ~ line 8 ~ fetchAllRestaurants ~ response",
+          response
+        );
+        const { restaurantsList } = response.data;
+        setRestaurantsList(restaurantsList);
+        setTotalRestaurantCount(response.data.totalNumRestaurants);
+        setIsLoading(false);
+      } catch (error) {
+        console.error(`Error in fetching restaurant data, ${error}`);
+      }
+    };
     fetchAllRestaurants();
   }, [currentPage]);
   let restaurants = [];
@@ -37,7 +37,8 @@ export default function RestaurantList() {
     restaurants = restaurantList.map((restaurant) => {
       const { name, _id, cuisine } = restaurant;
       const address = `${restaurant.address.building} ${restaurant.address.street} ${restaurant.address.zipcode}`;
-      return <RestaurantCard {...{ name, cuisine, _id, address }} />;
+
+      return <RestaurantCard key={_id} {...{ name, cuisine, address }} />;
     });
   }
   return (
