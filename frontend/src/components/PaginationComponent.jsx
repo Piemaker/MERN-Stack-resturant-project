@@ -12,13 +12,16 @@ export default function PaginationComponent({
   return (
     <Pagination className="justify-content-center">
       <Pagination.First
+        disabled={currentPage === 0}
         onClick={() => {
-          setCurrentPage(1);
+          setCurrentPage(0);
         }}
       />
       <Pagination.Prev
         onClick={() => {
-          setCurrentPage(currentPage - 1);
+          if (currentPage !== 0) {
+            setCurrentPage(currentPage - 1);
+          }
         }}
       />
       <Row className="align-items-center gx-0 p-1">
@@ -35,7 +38,7 @@ export default function PaginationComponent({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               type="number"
-              min="1"
+              min={1}
               max={lastPage}
               placeholder="1"
             ></input>
@@ -53,8 +56,11 @@ export default function PaginationComponent({
       </Row>
 
       <Pagination.Next
+        disabled={currentPage === lastPage}
         onClick={() => {
-          setCurrentPage(currentPage + 1);
+          if (currentPage < lastPage) {
+            setCurrentPage(currentPage + 1);
+          }
         }}
       />
       <Pagination.Last

@@ -14,11 +14,13 @@ import DataFetchingClass from "../../DataFetchingClass";
 import CustomSpinner from "../CustomSpinner";
 import PaginationComponent from "../PaginationComponent";
 import RestaurantCard from "./RestaurantCard";
+import { RiSearchEyeFill } from "react-icons/ri";
+import "./RestaurantList.css"
 
 export default function RestaurantList() {
   const [restaurantList, setRestaurantsList] = useState([]);
   const [cuisinesList, setCuisinesList] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const [totalRestaurantCount, setTotalRestaurantCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFilter, setSelectedFilter] = useState("Filter");
@@ -37,7 +39,6 @@ export default function RestaurantList() {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const isInvalidFilter =
       selectedFilter === "Filter" || selectedFilter === "Please Select";
     const isInvalidCuisine =
@@ -49,55 +50,69 @@ export default function RestaurantList() {
     if (isInvalidCuisine) {
       setIsInvalidCuisine(true);
     } else if (!isInvalidCuisine && !isInvalidFilter) {
-      let response;
-      try {
-        setIsLoading(true);
-        if (selectedFilter === "cuisine") {
-          response = await DataFetchingClass.getByQuery(
-            selectedFilter,
-            selectedCuisine
-          );
-        } else {
-          response = await DataFetchingClass.getByQuery(
-            selectedFilter,
-            userQuery
-          );
-        }
-        setRestaurantsList(response.data.restaurantsList);
-        setTotalRestaurantCount(response.data.restaurantsList.length);
-        setIsLoading(false);
-      } catch (error) {
-        console.error(`Error in fetching by query, ${error}`);
-      }
+      setCurrentPage(0);
+      fetchByQuery();
     }
   };
-  useEffect(() => {
-    const fetchAllRestaurants = async () => {
-      try {
-        setIsLoading(true);
-        const response = await DataFetchingClass.getAll(currentPage);
-        const cuisines = (await DataFetchingClass.getAllCuisines()).data
-          .response;
-        // console.log(
-        // "🚀 ~ file: RestaurantList.jsx ~ line 71 ~ fetchAllRestaurants ~ cuisines",
-        // cuisines
-        // );
-        const { restaurantsList } = response.data;
-        // // console.log("🚀 ~ file: RestaurantList.jsx ~ line 72 ~ fetchAllRestaurants ~ restaurantsList", restaurantsList)
+  const fetchAllRestaurants = async () => {
+    try {
+      setIsLoading(true);
+      const response = await DataFetchingClass.getAll(currentPage);
+      const cuisines = (await DataFetchingClass.getAllCuisines()).data.response;
+      const { restaurantsList } = response.data;
 
-        setRestaurantsList(restaurantsList);
-        setCuisinesList(cuisines);
-        setTotalRestaurantCount(response.data.totalNumRestaurants);
-        setIsLoading(false);
-      } catch (error) {
-        console.error(
-          `Error in fetching restaurant data or cuisines, ${error}`
+      setRestaurantsList(restaurantsList);
+      setCuisinesList(cuisines);
+      setTotalRestaurantCount(response.data.totalNumRestaurants);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(`Error in fetching restaurant data or cuisines, ${error}`);
+    }
+  };
+  const fetchByQuery = async () => {
+    try {
+      let response = [];
+      setIsLoading(true);
+      if (selectedFilter === "cuisine") {
+        response = await DataFetchingClass.getByQuery(
+          selectedFilter,
+          selectedCuisine,
+          currentPage
+        );
+      } else {
+        response = await DataFetchingClass.getByQuery(
+          selectedFilter,
+          userQuery,
+          currentPage
         );
       }
-    };
+      setRestaurantsList(response.data.restaurantsList);
+      setTotalRestaurantCount(response.data.restaurantsList.length);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(`Error in fetching by query, ${error}`);
+    }
+  };
+
+  useEffect(() => {
     fetchAllRestaurants();
+  }, []);
+
+  useEffect(() => {
+    const isInvalidFilter =
+      selectedFilter === "Filter" || selectedFilter === "Please Select";
+    const isInvalidCuisine =
+      (selectedCuisine === "Cuisines" || selectedCuisine === "Please Select") &&
+      selectedFilter === "cuisine";
+    if (isInvalidFilter) {
+      fetchAllRestaurants();
+    } else if (!isInvalidFilter && !isInvalidCuisine) {
+      fetchByQuery();
+    }
   }, [currentPage]);
+
   let restaurants = [];
+
   if (isLoading) {
     return <CustomSpinner />;
   }
@@ -109,12 +124,13 @@ export default function RestaurantList() {
       return <RestaurantCard key={_id} {...{ name, cuisine, address }} />;
     });
   }
+
   return (
     <Container>
       <Row className="mt-5 justify-content-center">
-        <Col xs={8} md={6} className="d-flex justify-content-center">
-          <Form onSubmit={handleSubmit}>
-            <InputGroup className="mb-3">
+        <Col xs={12} md={6} className="d-flex justify-content-center">
+        <Form onSubmit={handleSubmit} >
+            <InputGroup className="mb-3 shadow" >
               {selectedFilter !== "cuisine" && (
                 <FormControl
                   required
@@ -142,7 +158,8 @@ export default function RestaurantList() {
                 <Dropdown.Item eventKey="cuisine">Cuisine</Dropdown.Item>
               </DropdownButton>
               {selectedFilter === "cuisine" && (
-                <DropdownButton
+                              <DropdownButton
+                                  className = "max-vh-50"
                   variant="outline-dark"
                   title={isInvalidCuisine ? "Please Select" : selectedCuisine}
                   id="input-group-dropdown-2"
@@ -158,7 +175,9 @@ export default function RestaurantList() {
                   })}
                 </DropdownButton>
               )}
-              <Button type="submit" variant="outline-dark" />
+              <Button type="submit" variant="outline-dark">
+                <RiSearchEyeFill size="1.5rem" />
+              </Button>
             </InputGroup>
           </Form>
         </Col>
