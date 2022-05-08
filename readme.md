@@ -10,6 +10,10 @@
 #### 2- Pagination
 ![Pagination](/GIFs/Paginaton.gif)
 
+### 3- Login-Logout
+The user is then able to add/update/delete a review.
+![Login-Logout](/GIFs/Login-Logout.gif)
+
 
 ### Starting the App
 Refer to backend & frontend readme

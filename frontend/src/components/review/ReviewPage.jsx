@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Col, Container, Row } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { Button, Col, Container, Row } from "react-bootstrap";
+import { Link, useParams } from "react-router-dom";
 import DataFetchingClass from "../../DataFetchingClass";
 import CustomSpinner from "../CustomSpinner";
 import RestaurantCard from "../restaurant/RestaurantCard";
 import ReviewCard from "./ReviewCard";
 
-export default function ReviewPage() {
+export default function ReviewPage({ isLogged }) {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(true);
   const [restaurant, setRestaurant] = useState({});
+  const loggedInUserId = window.localStorage.getItem("userId");
   // TODO add loggedInUserId from browser storage when user login
   // TODO add add review button which will open a form for the user to add his review
-  const loggedInUserId = 512;
+
   useEffect(() => {
     const getRestaurant = async (id) => {
       try {
@@ -42,12 +43,22 @@ export default function ReviewPage() {
           key={_id}
         >
           <ReviewCard
-            {...{ name, userId, text, date, restaurantId: id, loggedInUserId }}
+            {...{
+              name,
+              userId,
+              text,
+              date,
+              restaurantId: id,
+              loggedInUserId,
+              isLogged,
+            }}
           />
         </Col>
       );
     });
-    const noReviewsResponse = <h2 className="text-center">No reviews found, be the first to review</h2>;
+    const noReviewsResponse = (
+      <h2 className="text-center">No reviews found, be the first to review</h2>
+    );
     return (
       <Container className="mt-5">
         <Row>
@@ -67,7 +78,22 @@ export default function ReviewPage() {
 
         <Row className="my-4 g-5">
           <h2 className="mb-4 text-center">Reviews</h2>
-          {restaurant.restaurant_reviews.length ? reviewList : noReviewsResponse}
+
+          {isLogged ? (
+            <Link
+              className="text-center text-capitalize text"
+              to={`/id/${id}/review`}
+            >
+              <Button variant="outline-dark">Add review</Button>
+            </Link>
+          ) : (
+            <Link className="text-center text-capitalize text" to={`/login`}>
+              <Button variant="outline-dark"> Login to add a review</Button>
+            </Link>
+          )}
+          {restaurant.restaurant_reviews.length
+            ? reviewList
+            : noReviewsResponse}
         </Row>
       </Container>
     );
@@ -75,5 +101,5 @@ export default function ReviewPage() {
   if (isLoading) {
     return <CustomSpinner />;
   }
-  return (<></>)
+  return <></>;
 }
