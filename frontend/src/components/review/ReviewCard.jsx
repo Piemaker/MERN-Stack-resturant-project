@@ -1,8 +1,11 @@
-import React from "react";
-import { Button, Card, Col, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Alert, Button, Card, Col, Row } from "react-bootstrap";
 import { AiFillDelete } from "react-icons/ai";
 import { AiFillEdit } from "react-icons/ai";
+import { Link } from "react-router-dom";
+import DataFetchingClass from "../../DataFetchingClass";
 export default function ReviewCard({
+  _id,
   name,
   userId,
   text,
@@ -10,8 +13,30 @@ export default function ReviewCard({
   restaurantId,
   loggedInUserId,
   isLogged,
+  setIsReviewsChanged,
 }) {
-    // TODO add functionality for editing/deleting/adding reviews
+  // TODO add functionality for editing/deleting/adding reviews
+  const [isErrorDeleting, setIsErrorDeleting] = useState(false);
+  const handleDelete = async () => {
+    try {
+      setIsErrorDeleting(false);
+      setIsReviewsChanged(false);
+      const response = await DataFetchingClass.deleteReview(_id, userId);
+      // console.log(
+      // "🚀 ~ file: ReviewCard.jsx ~ line 22 ~ handleDelete ~ response",
+      // response
+      // );
+      const { status } = response;
+      if (status === 200) {
+        setIsReviewsChanged(true);
+      } else {
+        setIsErrorDeleting(true);
+      }
+    } catch (error) {
+      console.error(`Error in deleting review, ${error}`);
+      setIsErrorDeleting(true);
+    }
+  };
   return (
     <Card className="d-flex" text="white" bg="dark" style={{ width: "18rem" }}>
       <Card.Body>
@@ -32,16 +57,23 @@ export default function ReviewCard({
       {isLogged && loggedInUserId === userId && (
         <Row className="g-1 mx-2 mb-2">
           <Col className="">
-            <Button variant="outline-light w-100">
-              <AiFillEdit size="1.5rem" color="orange" />
-            </Button>
+            <Link to={`/id/${restaurantId}/review/${true}`}>
+              <Button variant="outline-light w-100">
+                <AiFillEdit size="1.5rem" color="orange" />
+              </Button>
+            </Link>
           </Col>
           <Col className="m-1">
-            <Button variant="outline-light w-100">
+            <Button variant="outline-light w-100" onClick={handleDelete}>
               <AiFillDelete size="1.5rem" color="red" />
             </Button>
           </Col>
         </Row>
+      )}
+      {isErrorDeleting && (
+        <Alert className="mt-2 text-uppercase text-center" variant={"danger"}>
+          Error in deleting review
+        </Alert>
       )}
     </Card>
   );

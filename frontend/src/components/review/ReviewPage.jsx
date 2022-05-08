@@ -11,27 +11,36 @@ export default function ReviewPage({ isLogged }) {
   const [isLoading, setIsLoading] = useState(true);
   const [restaurant, setRestaurant] = useState({});
   const loggedInUserId = window.localStorage.getItem("userId");
+  const [isReviewsChanged, setIsReviewsChanged] = useState(false);
   // TODO add loggedInUserId from browser storage when user login
   // TODO add add review button which will open a form for the user to add his review
 
+  const getRestaurant = async (id) => {
+    try {
+      setIsLoading(true);
+      const response = await DataFetchingClass.getRestaurantById(id);
+      const restaurant = response.data.response;
+      // console.log(
+      // "🚀 ~ file: ReviewPage.jsx ~ line 17 ~ getRestaurant ~ restaurant",
+      // restaurant
+      // );
+      setRestaurant(restaurant);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(`Error in fetching restaurant by id, ${error}`);
+    }
+  };
+
   useEffect(() => {
-    const getRestaurant = async (id) => {
-      try {
-        setIsLoading(true);
-        const response = await DataFetchingClass.getRestaurantById(id);
-        const restaurant = response.data.response;
-        // console.log(
-        // "🚀 ~ file: ReviewPage.jsx ~ line 17 ~ getRestaurant ~ restaurant",
-        // restaurant
-        // );
-        setRestaurant(restaurant);
-        setIsLoading(false);
-      } catch (error) {
-        console.error(`Error in fetching restaurant by id, ${error}`);
-      }
-    };
     getRestaurant(id);
   }, [id]);
+
+  useEffect(() => {
+    if (isReviewsChanged) {
+      getRestaurant(id);
+    }
+  }, [isReviewsChanged]);
+
   if (Object.keys(restaurant).length) {
     const { name, cuisine, _id } = restaurant;
     const address = `${restaurant.address.building} ${restaurant.address.street} ${restaurant.address.zipcode}`;
@@ -44,6 +53,7 @@ export default function ReviewPage({ isLogged }) {
         >
           <ReviewCard
             {...{
+              _id,
               name,
               userId,
               text,
@@ -51,6 +61,7 @@ export default function ReviewPage({ isLogged }) {
               restaurantId: id,
               loggedInUserId,
               isLogged,
+              setIsReviewsChanged,
             }}
           />
         </Col>
@@ -82,7 +93,7 @@ export default function ReviewPage({ isLogged }) {
           {isLogged ? (
             <Link
               className="text-center text-capitalize text"
-              to={`/id/${id}/review`}
+              to={`/id/${id}/review/${false}`}
             >
               <Button variant="outline-dark">Add review</Button>
             </Link>

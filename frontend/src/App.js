@@ -20,7 +20,7 @@ function App() {
           element={<ReviewPage {...{ isLogged }} />}
         ></Route>
         <Route
-          path="/id/:id/review"
+          path="/id/:id/review/:isEdit"
           element={<AddEditReviewFrom {...{ isLogged }} />}
         ></Route>
 
