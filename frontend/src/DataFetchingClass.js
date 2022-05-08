@@ -14,6 +14,18 @@ export default class DataFetchingClass {
   static getRestaurantById(id) {
     return configedAxios.get(`/id/${id}`);
   }
+  static addReview(reviewObject) {
+    //! Notice that if you use the data key for object having more than one field, the req will have
+    //! this structure body.data
+    return configedAxios.post("/reviews", {
+      ...reviewObject,
+    });
+  }
+  static updateReview(reviewObject) {
+    return configedAxios.put("/reviews", {
+      ...reviewObject,
+    });
+  }
   static deleteReview(reviewId, userId) {
     return configedAxios.delete("/reviews", {
       params: {

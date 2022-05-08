@@ -93,7 +93,7 @@ export default function ReviewPage({ isLogged }) {
           {isLogged ? (
             <Link
               className="text-center text-capitalize text"
-              to={`/id/${id}/review/${false}`}
+              to={`/id/${id}/${_id}/addReview`}
             >
               <Button variant="outline-dark">Add review</Button>
             </Link>

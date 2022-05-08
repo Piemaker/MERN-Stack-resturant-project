@@ -15,7 +15,6 @@ export default function ReviewCard({
   isLogged,
   setIsReviewsChanged,
 }) {
-  // TODO add functionality for editing/deleting/adding reviews
   const [isErrorDeleting, setIsErrorDeleting] = useState(false);
   const handleDelete = async () => {
     try {
@@ -45,10 +44,10 @@ export default function ReviewCard({
           <span className="text-muted">Review:&nbsp;</span>
           {text}
         </Card.Subtitle>
-        <Card.Subtitle className="mb-2 ">
+        {/* <Card.Subtitle className="mb-2 ">
           <span className="text-muted">User ID:&nbsp;</span>
           {userId}
-        </Card.Subtitle>
+        </Card.Subtitle> */}
         <Card.Subtitle className="mb-2 ">
           <span className="text-muted">Date:&nbsp;</span>
           {new Date(date).toDateString()}
@@ -57,7 +56,7 @@ export default function ReviewCard({
       {isLogged && loggedInUserId === userId && (
         <Row className="g-1 mx-2 mb-2">
           <Col className="">
-            <Link to={`/id/${restaurantId}/review/${true}`}>
+            <Link to={`/id/${restaurantId}/${_id}/${text}`}>
               <Button variant="outline-light w-100">
                 <AiFillEdit size="1.5rem" color="orange" />
               </Button>

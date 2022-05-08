@@ -46,6 +46,7 @@ export default class ReviewsDAO {
   }
 
   static async apiAddReview({ restaurantId, user, text, date } = {}) {
+    console.log("🚀 ~ file: reviewsDAO.js ~ line 49 ~ ReviewsDAO ~ apiAddReview ~ restaurantId, user, text, date", restaurantId, user, text, date)
     try {
       const reviewDoc = {
         ...user,
