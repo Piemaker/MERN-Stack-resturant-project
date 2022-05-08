@@ -11,4 +11,8 @@ export default class DataFetchingClass {
         return configedAxios.get(`/cuisines`);
     }
 
+    static getRestaurantById(id) {
+        return configedAxios.get(`/id/${id}`)
+    }
+
 }

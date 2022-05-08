@@ -121,7 +121,7 @@ export default function RestaurantList() {
       const { name, _id, cuisine } = restaurant;
       const address = `${restaurant.address.building} ${restaurant.address.street} ${restaurant.address.zipcode}`;
 
-      return <RestaurantCard key={_id} {...{ name, cuisine, address }} />;
+      return <RestaurantCard key={_id} {...{ name, cuisine, address, _id }} />;
     });
   }
 
